@@ -1,8 +1,8 @@
 name: meal_generator
 description: "A Flutter application for generating personalized meal plans and recipes."
-homepage: https://github.com/[YOUR_USERNAME]/meal_generator
-repository: https://github.com/[YOUR_USERNAME]/meal_generator
-issue_tracker: https://github.com/[YOUR_USERNAME]/meal_generator/issues
+homepage: https://github.com/blackjoeyai-cpu/meal_generator
+repository: https://github.com/blackjoeyai-cpu/meal_generator
+issue_tracker: https://github.com/blackjoeyai-cpu/meal_generator/issues
 publish_to: 'none'
 version: 0.1.0
 

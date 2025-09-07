@@ -16,7 +16,7 @@ Thank you for considering contributing to the Meal Generator project! We welcome
 1. Ensure you have Flutter SDK installed (version 3.9.2 or higher)
 2. Clone the repository:
    ```bash
-   git clone https://github.com/[YOUR_USERNAME]/meal_generator.git
+   git clone https://github.com/blackjoeyai-cpu/meal_generator.git
    cd meal_generator
    ```
 3. Install dependencies:

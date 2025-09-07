@@ -23,7 +23,7 @@ A Flutter application for generating personalized meal plans and recipes.
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/[YOUR_USERNAME]/meal_generator.git
+   git clone https://github.com/blackjoeyai-cpu/meal_generator.git
    cd meal_generator
    ```
 
