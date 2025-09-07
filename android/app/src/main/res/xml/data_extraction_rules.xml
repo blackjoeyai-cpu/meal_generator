@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Data extraction rules for Meal Planner app (Android 12+) -->
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Include database files -->
+        <include domain="database" path="." />
+        
+        <!-- Include shared preferences -->
+        <include domain="sharedpref" path="." />
+        
+        <!-- Exclude sensitive or cache files -->
+        <exclude domain="database" path="cache/" />
+        <exclude domain="file" path="cache/" />
+    </cloud-backup>
+    
+    <device-transfer>
+        <!-- Include all user data for device transfer -->
+        <include domain="database" path="." />
+        <include domain="sharedpref" path="." />
+        <include domain="file" path="app_data/" />
+    </device-transfer>
+</data-extraction-rules>

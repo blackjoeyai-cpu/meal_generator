@@ -22,14 +22,26 @@ jobs:
     - name: Install dependencies
       run: flutter pub get
     
+    - name: Generate mock files
+      run: dart run build_runner build --delete-conflicting-outputs
+    
     - name: Verify formatting
       run: dart format --output=none --set-exit-if-changed .
     
     - name: Analyze code
       run: flutter analyze
     
-    - name: Run tests
-      run: flutter test --coverage
+    - name: Run unit tests
+      run: flutter test --coverage --reporter expanded
+    
+    - name: Check test coverage
+      run: |
+        echo "Checking test coverage..."
+        if [ -f coverage/lcov.info ]; then
+          echo "Coverage file found"
+        else
+          echo "Warning: No coverage file generated"
+        fi
     
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
@@ -52,6 +64,9 @@ jobs:
     
     - name: Install dependencies
       run: flutter pub get
+    
+    - name: Generate mock files
+      run: dart run build_runner build --delete-conflicting-outputs
     
     - name: Build APK
       run: flutter build apk --release
@@ -78,6 +93,9 @@ jobs:
     - name: Install dependencies
       run: flutter pub get
     
+    - name: Generate mock files
+      run: dart run build_runner build --delete-conflicting-outputs
+    
     - name: Build iOS (no sign)
       run: flutter build ios --release --no-codesign
     
@@ -86,3 +104,31 @@ jobs:
       with:
         name: ios-build
         path: build/ios/iphoneos/Runner.app
+
+  build-web:
+    needs: test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.19.0'
+        channel: 'stable'
+    
+    - name: Install dependencies
+      run: flutter pub get
+    
+    - name: Generate mock files
+      run: dart run build_runner build --delete-conflicting-outputs
+    
+    - name: Build Web
+      run: flutter build web --release
+    
+    - name: Upload Web artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: web-build
+        path: build/web/

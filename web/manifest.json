@@ -1,13 +1,16 @@
 {
-    "name": "meal_generator",
-    "short_name": "meal_generator",
+    "name": "Meal Planner - Smart Recipe Generator",
+    "short_name": "Meal Planner",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#2E7D32",
+    "theme_color": "#2E7D32",
+    "description": "Generate personalized meal plans based on available ingredients. Plan your meals efficiently with smart recipe suggestions.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
+    "categories": ["food", "lifestyle", "health"],
+    "lang": "en",
+    "scope": "/",
     "icons": [
         {
             "src": "icons/Icon-192.png",
@@ -30,6 +33,32 @@
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Generate Meal Plan",
+            "short_name": "Generate",
+            "description": "Generate a new meal plan for today",
+            "url": "/?action=generate",
+            "icons": [
+                {
+                    "src": "icons/Icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "View Calendar",
+            "short_name": "Calendar",
+            "description": "View meal plan calendar",
+            "url": "/?tab=calendar",
+            "icons": [
+                {
+                    "src": "icons/Icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
         }
     ]
 }

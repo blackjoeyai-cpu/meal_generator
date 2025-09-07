@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Backup rules for Meal Planner app -->
+<full-backup-content>
+    <!-- Include database files -->
+    <include domain="database" path="." />
+    
+    <!-- Include shared preferences -->
+    <include domain="sharedpref" path="." />
+    
+    <!-- Exclude sensitive files -->
+    <exclude domain="database" path="cache/" />
+    <exclude domain="file" path="cache/" />
+    
+    <!-- Include app-specific data -->
+    <include domain="file" path="app_data/" />
+</full-backup-content>
