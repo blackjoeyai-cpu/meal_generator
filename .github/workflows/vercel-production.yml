@@ -112,7 +112,10 @@ jobs:
         working-directory: ./build/web
 
       - name: Deploy Project Artifacts
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: |
+          DEPLOYMENT_URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          echo "PRODUCTION_URL=$DEPLOYMENT_URL" >> $GITHUB_ENV
+          echo "Production deployment URL: $DEPLOYMENT_URL"
         working-directory: ./build/web
         id: vercel-deployment
 
@@ -122,7 +125,7 @@ jobs:
           echo "## 🚀 Production Deployment Summary" >> $GITHUB_STEP_SUMMARY
           if [ "${{ job.status }}" == "success" ]; then
             echo "- Status: ✅ Production deployed successfully" >> $GITHUB_STEP_SUMMARY
-            echo "- Production URL: ${{ steps.vercel-deployment.outputs.preview-url }}" >> $GITHUB_STEP_SUMMARY
+            echo "- Production URL: [${{ env.PRODUCTION_URL }}](${{ env.PRODUCTION_URL }})" >> $GITHUB_STEP_SUMMARY
             echo "- Branch: \`${GITHUB_REF_NAME}\`" >> $GITHUB_STEP_SUMMARY
             echo "- Commit: \`${GITHUB_SHA:0:8}\`" >> $GITHUB_STEP_SUMMARY
             echo "- Deployed by: \`${GITHUB_ACTOR}\`" >> $GITHUB_STEP_SUMMARY

@@ -115,7 +115,10 @@ jobs:
         working-directory: ./build/web
 
       - name: Deploy Project Artifacts
-        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+        run: |
+          DEPLOYMENT_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "PREVIEW_URL=$DEPLOYMENT_URL" >> $GITHUB_ENV
+          echo "Preview deployment URL: $DEPLOYMENT_URL"
         working-directory: ./build/web
         id: vercel-deployment
 
@@ -125,7 +128,7 @@ jobs:
           echo "## 🌐 Preview Deployment Summary" >> $GITHUB_STEP_SUMMARY
           if [ "${{ job.status }}" == "success" ]; then
             echo "- Status: ✅ Preview deployed successfully" >> $GITHUB_STEP_SUMMARY
-            echo "- Preview URL: ${{ steps.vercel-deployment.outputs.preview-url }}" >> $GITHUB_STEP_SUMMARY
+            echo "- Preview URL: [${{ env.PREVIEW_URL }}](${{ env.PREVIEW_URL }})" >> $GITHUB_STEP_SUMMARY
             echo "- Branch: \`${GITHUB_REF_NAME}\`" >> $GITHUB_STEP_SUMMARY
             echo "- Commit: \`${GITHUB_SHA:0:8}\`" >> $GITHUB_STEP_SUMMARY
             echo "- Triggered by: \`${GITHUB_ACTOR}\`" >> $GITHUB_STEP_SUMMARY
