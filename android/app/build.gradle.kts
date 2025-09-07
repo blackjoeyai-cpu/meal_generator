@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.meal_generator"
+    namespace = "com.mealplanner.generator"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 

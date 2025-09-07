@@ -1,5 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.mealplanner.generator">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
     
     <!-- Internet permission for API calls and web functionality -->
     <uses-permission android:name="android.permission.INTERNET" />
