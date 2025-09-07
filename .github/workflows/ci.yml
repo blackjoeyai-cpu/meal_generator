@@ -201,23 +201,12 @@ jobs:
       - name: Build Web App
         run: flutter build web --release
       
-      - name: Upload Web Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: web-build
-          path: build/web/
-          retention-days: ${{ vars.ARTIFACT_RETENTION_DAYS || 7 }}
-      
       - name: 📋 Write Web Build Summary
         if: always()
         run: |
           echo "## 🌐 Web Build Summary" >> $GITHUB_STEP_SUMMARY
           if [ "${{ job.status }}" == "success" ]; then
             echo "- Status: ✅ Web app built successfully" >> $GITHUB_STEP_SUMMARY
-            echo "- Artifact: [web-build](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)" >> $GITHUB_STEP_SUMMARY
-            echo "- Direct Download: [web-build.zip](https://nightly.link/${{ github.repository }}/actions/runs/${{ github.run_id }}/web-build.zip)" >> $GITHUB_STEP_SUMMARY
-            echo "- Build Size: $(du -sh build/web | cut -f1)" >> $GITHUB_STEP_SUMMARY
-            echo "- Retention: ⏳ ${{ vars.ARTIFACT_RETENTION_DAYS || 7 }} days" >> $GITHUB_STEP_SUMMARY
           else
             echo "- Status: ❌ Build failed" >> $GITHUB_STEP_SUMMARY
           fi

@@ -8,15 +8,18 @@
         <!-- Include shared preferences -->
         <include domain="sharedpref" path="." />
         
-        <!-- Exclude sensitive or cache files -->
-        <exclude domain="database" path="cache/" />
-        <exclude domain="file" path="cache/" />
+        <!-- Include app files -->
+        <include domain="file" path="." />
+        
+        <!-- Exclude temporary and cache files -->
+        <exclude domain="file" path="cache" />
+        <exclude domain="file" path="tmp" />
     </cloud-backup>
     
     <device-transfer>
         <!-- Include all user data for device transfer -->
         <include domain="database" path="." />
         <include domain="sharedpref" path="." />
-        <include domain="file" path="app_data/" />
+        <include domain="file" path="." />
     </device-transfer>
 </data-extraction-rules>

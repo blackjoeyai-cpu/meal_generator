@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         applicationId = "com.mealplanner.generator"
-        minSdk = 21
+        minSdk = flutter.minSdkVersion
         targetSdk = 34
         versionCode = 1
         versionName = "0.1.0"
