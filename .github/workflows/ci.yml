@@ -14,6 +14,36 @@ env:
   FLUTTER_VERSION: ${{ vars.FLUTTER_VERSION }} # e.g., 3.35.3
 
 jobs:
+  security:
+    name: 🔐 Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for better secret detection
+      
+      - name: GitGuardian scan
+        uses: GitGuardian/ggshield-action@v1.25.0
+        env:
+          GITHUB_PUSH_BEFORE_SHA: ${{ github.event.before }}
+          GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
+          GITHUB_PULL_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          GITHUB_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
+      
+      - name: 📋 Write Security Summary
+        if: always()
+        run: |
+          echo "## 🔐 Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "- Status: ✅ No security issues detected" >> $GITHUB_STEP_SUMMARY
+            echo "- Scanner: GitGuardian Shield" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- Status: ❌ Security issues detected" >> $GITHUB_STEP_SUMMARY
+            echo "- Action: Review the GitGuardian scan results" >> $GITHUB_STEP_SUMMARY
+          fi
+
   tests:
     name: 🧪 Tests
     runs-on: ubuntu-latest
@@ -81,7 +111,7 @@ jobs:
   build-android:
     name: 📱 Build Android APK
     runs-on: ubuntu-latest
-    needs: tests
+    needs: [security, tests]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -141,7 +171,7 @@ jobs:
   build-web:
     name: 🌐 Build Web App
     runs-on: ubuntu-latest
-    needs: tests
+    needs: [security, tests]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -195,7 +225,7 @@ jobs:
   workflow-summary:
     name: 📋 Final Workflow Summary
     runs-on: ubuntu-latest
-    needs: [tests, build-android, build-web]
+    needs: [security, tests, build-android, build-web]
     if: always()
     steps:
       - name: Consolidated Summary
@@ -203,6 +233,10 @@ jobs:
           echo "## 🏁 Complete Workflow Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
+          echo "### 🔐 Security" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ needs.security.result }}" >> $GITHUB_STEP_SUMMARY
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🧪 Tests" >> $GITHUB_STEP_SUMMARY
           echo "- Status: ${{ needs.tests.result }}" >> $GITHUB_STEP_SUMMARY
           
@@ -218,6 +252,7 @@ jobs:
           echo "- Status: ${{ needs.build-web.result }}" >> $GITHUB_STEP_SUMMARY
           if [ "${{ needs.build-web.result }}" == "success" ]; then
             echo "- Web Download: [web-build.zip](https://nightly.link/${{ github.repository }}/actions/runs/${{ github.run_id }}/web-build.zip)" >> $GITHUB_STEP_SUMMARY
+            echo "- Note: Deployment handled by separate Vercel workflows" >> $GITHUB_STEP_SUMMARY
           fi
           
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -228,10 +263,10 @@ jobs:
           echo "- Actor: \`${GITHUB_ACTOR}\`" >> $GITHUB_STEP_SUMMARY
           
           echo "" >> $GITHUB_STEP_SUMMARY
-          if [[ "${{ needs.tests.result }}" == "success" && "${{ needs.build-android.result }}" == "success" && "${{ needs.build-web.result }}" == "success" ]]; then
+          if [[ "${{ needs.security.result }}" == "success" && "${{ needs.tests.result }}" == "success" && "${{ needs.build-android.result }}" == "success" && "${{ needs.build-web.result }}" == "success" ]]; then
             echo "🎉 **Overall Status: SUCCESS**" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "All builds completed successfully! Downloads available above." >> $GITHUB_STEP_SUMMARY
+            echo "All builds completed successfully! Downloads available above. Deployments handled by separate Vercel workflows." >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Overall Status: FAILED**" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
