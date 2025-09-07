@@ -2,22 +2,30 @@ name: Flutter CI/CD
 
 on:
   push:
-    branches: [ main, develop ]
+    branches:
+      - main
+      - develop
+      - '**'
   pull_request:
-    branches: [ main ]
+    branches:
+      - '**'
+
+env:
+  FLUTTER_VERSION: ${{ vars.FLUTTER_VERSION }} # e.g., 3.35.3
 
 jobs:
   test:
+    name: 🧪 Tests
     runs-on: ubuntu-latest
-    
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
     
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.19.0'
-        channel: 'stable'
+        flutter-version:  ${{ env.FLUTTER_VERSION }}
+        cache: true
     
     - name: Install dependencies
       run: flutter pub get
@@ -52,15 +60,20 @@ jobs:
   build-android:
     needs: test
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v4
+    
+    - name: Set up Java (for Android)
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17' 
     
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.19.0'
-        channel: 'stable'
+        flutter-version:  ${{ env.FLUTTER_VERSION }}
+        cache: true
     
     - name: Install dependencies
       run: flutter pub get
@@ -76,34 +89,7 @@ jobs:
       with:
         name: app-release.apk
         path: build/app/outputs/flutter-apk/app-release.apk
-
-  build-ios:
-    needs: test
-    runs-on: macos-latest
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.19.0'
-        channel: 'stable'
-    
-    - name: Install dependencies
-      run: flutter pub get
-    
-    - name: Generate mock files
-      run: dart run build_runner build --delete-conflicting-outputs
-    
-    - name: Build iOS (no sign)
-      run: flutter build ios --release --no-codesign
-    
-    - name: Upload iOS artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: ios-build
-        path: build/ios/iphoneos/Runner.app
+        retention-days: ${{ vars.ARTIFACT_RETENTION_DAYS || 7 }}
 
   build-web:
     needs: test
@@ -115,8 +101,8 @@ jobs:
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.19.0'
-        channel: 'stable'
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        cache: true
     
     - name: Install dependencies
       run: flutter pub get
@@ -132,3 +118,4 @@ jobs:
       with:
         name: web-build
         path: build/web/
+        retention-days: ${{ vars.ARTIFACT_RETENTION_DAYS || 7 }}
