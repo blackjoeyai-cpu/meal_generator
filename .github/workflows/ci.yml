@@ -130,7 +130,9 @@ jobs:
           echo "## 📱 Android Build Summary" >> $GITHUB_STEP_SUMMARY
           if [ "${{ job.status }}" == "success" ]; then
             echo "- Status: ✅ APK built successfully" >> $GITHUB_STEP_SUMMARY
-            echo "- Output: [Download APK](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+            echo "- Artifact: [android-apk](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)" >> $GITHUB_STEP_SUMMARY
+            echo "- Direct Download: [app-release.apk](https://nightly.link/${{ github.repository }}/actions/runs/${{ github.run_id }}/android-apk.zip)" >> $GITHUB_STEP_SUMMARY
+            echo "- File Size: $(du -h build/app/outputs/flutter-apk/app-release.apk | cut -f1)" >> $GITHUB_STEP_SUMMARY
             echo "- Retention: ⏳ ${{ vars.ARTIFACT_RETENTION_DAYS || 7 }} days" >> $GITHUB_STEP_SUMMARY
           else
             echo "- Status: ❌ Build failed" >> $GITHUB_STEP_SUMMARY
@@ -182,8 +184,60 @@ jobs:
           echo "## 🌐 Web Build Summary" >> $GITHUB_STEP_SUMMARY
           if [ "${{ job.status }}" == "success" ]; then
             echo "- Status: ✅ Web app built successfully" >> $GITHUB_STEP_SUMMARY
-            echo "- Output: [Download Web Build](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+            echo "- Artifact: [web-build](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)" >> $GITHUB_STEP_SUMMARY
+            echo "- Direct Download: [web-build.zip](https://nightly.link/${{ github.repository }}/actions/runs/${{ github.run_id }}/web-build.zip)" >> $GITHUB_STEP_SUMMARY
+            echo "- Build Size: $(du -sh build/web | cut -f1)" >> $GITHUB_STEP_SUMMARY
             echo "- Retention: ⏳ ${{ vars.ARTIFACT_RETENTION_DAYS || 7 }} days" >> $GITHUB_STEP_SUMMARY
           else
             echo "- Status: ❌ Build failed" >> $GITHUB_STEP_SUMMARY
           fi
+
+  workflow-summary:
+    name: 📋 Final Workflow Summary
+    runs-on: ubuntu-latest
+    needs: [tests, build-android, build-web]
+    if: always()
+    steps:
+      - name: Consolidated Summary
+        run: |
+          echo "## 🏁 Complete Workflow Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 🧪 Tests" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ needs.tests.result }}" >> $GITHUB_STEP_SUMMARY
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📱 Android Build" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ needs.build-android.result }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.build-android.result }}" == "success" ]; then
+            echo "- APK Download: [android-apk.zip](https://nightly.link/${{ github.repository }}/actions/runs/${{ github.run_id }}/android-apk.zip)" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🌐 Web Build" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ needs.build-web.result }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.build-web.result }}" == "success" ]; then
+            echo "- Web Download: [web-build.zip](https://nightly.link/${{ github.repository }}/actions/runs/${{ github.run_id }}/web-build.zip)" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔧 Branch & Commit Info" >> $GITHUB_STEP_SUMMARY
+          echo "- Branch: \`${GITHUB_REF_NAME}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: \`${GITHUB_SHA:0:8}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Triggered by: \`${GITHUB_EVENT_NAME}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Actor: \`${GITHUB_ACTOR}\`" >> $GITHUB_STEP_SUMMARY
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.tests.result }}" == "success" && "${{ needs.build-android.result }}" == "success" && "${{ needs.build-web.result }}" == "success" ]]; then
+            echo "🎉 **Overall Status: SUCCESS**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "All builds completed successfully! Downloads available above." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Overall Status: FAILED**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Some builds failed. Check the individual job logs for details." >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "*Generated on $(date -u +'%Y-%m-%d %H:%M:%S UTC')*" >> $GITHUB_STEP_SUMMARY
