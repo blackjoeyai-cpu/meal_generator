@@ -59,7 +59,10 @@ void main() {
 
       // Check dialog header
       expect(find.text('Custom Meal Generation'), findsOneWidget);
-      expect(find.text('Create a meal with your selected materials and preferences'), findsOneWidget);
+      expect(
+        find.text('Create a meal with your selected materials and preferences'),
+        findsOneWidget,
+      );
 
       // Check tabs
       expect(find.text('Materials'), findsOneWidget);
@@ -72,7 +75,9 @@ void main() {
       expect(find.text('Generate Meal'), findsOneWidget);
     });
 
-    testWidgets('should pre-select materials when provided', (WidgetTester tester) async {
+    testWidgets('should pre-select materials when provided', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -90,7 +95,9 @@ void main() {
       expect(find.text('Broccoli'), findsAtLeastNWidgets(1));
     });
 
-    testWidgets('should allow material selection and deselection', (WidgetTester tester) async {
+    testWidgets('should allow material selection and deselection', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -104,7 +111,8 @@ void main() {
 
       // Find Rice checkbox and select it
       final riceCheckbox = find.byWidgetPredicate(
-        (widget) => widget is CheckboxListTile &&
+        (widget) =>
+            widget is CheckboxListTile &&
             widget.title is Text &&
             (widget.title as Text).data == 'Rice',
       );
@@ -117,7 +125,8 @@ void main() {
 
       // Deselect Chicken Breast by tapping its chip
       final chickenChip = find.byWidgetPredicate(
-        (widget) => widget is Chip &&
+        (widget) =>
+            widget is Chip &&
             widget.label is Text &&
             (widget.label as Text).data == 'Chicken Breast',
       );
@@ -157,7 +166,9 @@ void main() {
       expect(find.text('Target Calories'), findsOneWidget);
     });
 
-    testWidgets('should allow meal type selection', (WidgetTester tester) async {
+    testWidgets('should allow meal type selection', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -175,21 +186,27 @@ void main() {
 
       // Select Dinner by finding the dinner list tile
       final dinnerTile = find.byWidgetPredicate(
-        (widget) => widget is ListTile &&
+        (widget) =>
+            widget is ListTile &&
             widget.title is Row &&
-            ((widget.title as Row).children.any((child) => 
-                child is Text && child.data == models.MealType.dinner.displayName)),
+            ((widget.title as Row).children.any(
+              (child) =>
+                  child is Text &&
+                  child.data == models.MealType.dinner.displayName,
+            )),
       );
       await tester.tap(dinnerTile);
       await tester.pumpAndSettle();
 
       // Verify dinner is selected by checking internal state through UI behavior
       await tester.pumpAndSettle();
-      
+
       // We can verify selection by checking the generated summary or other UI indicators
     });
 
-    testWidgets('should allow preferences selection', (WidgetTester tester) async {
+    testWidgets('should allow preferences selection', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -217,23 +234,31 @@ void main() {
       expect(find.text('Asian'), findsOneWidget);
 
       // Select some preferences
-      await tester.tap(find.byWidgetPredicate(
-        (widget) => widget is CheckboxListTile &&
-            widget.title is Text &&
-            (widget.title as Text).data == 'High-Protein',
-      ));
+      await tester.tap(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is CheckboxListTile &&
+              widget.title is Text &&
+              (widget.title as Text).data == 'High-Protein',
+        ),
+      );
       await tester.pumpAndSettle();
 
       // Select cuisine
-      await tester.tap(find.byWidgetPredicate(
-        (widget) => widget is FilterChip &&
-            widget.label is Text &&
-            (widget.label as Text).data == 'Italian',
-      ));
+      await tester.tap(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is FilterChip &&
+              widget.label is Text &&
+              (widget.label as Text).data == 'Italian',
+        ),
+      );
       await tester.pumpAndSettle();
     });
 
-    testWidgets('should show generation summary in details tab', (WidgetTester tester) async {
+    testWidgets('should show generation summary in details tab', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -252,12 +277,17 @@ void main() {
       // Should show generation summary
       expect(find.text('Generation Summary:'), findsOneWidget);
       expect(find.text('Materials: 2 selected'), findsOneWidget);
-      expect(find.text('Meal Type: Lunch'), findsOneWidget); // Default meal type
+      expect(
+        find.text('Meal Type: Lunch'),
+        findsOneWidget,
+      ); // Default meal type
       expect(find.text('Prep Time: 30 minutes'), findsOneWidget);
       expect(find.text('Target Calories: 500 cal'), findsOneWidget);
     });
 
-    testWidgets('should allow custom meal name and description', (WidgetTester tester) async {
+    testWidgets('should allow custom meal name and description', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -287,7 +317,9 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('should disable generate button with insufficient materials', (WidgetTester tester) async {
+    testWidgets('should disable generate button with insufficient materials', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -309,7 +341,9 @@ void main() {
       expect(tester.widget<ElevatedButton>(generateButton).onPressed, null);
     });
 
-    testWidgets('should enable generate button with sufficient materials', (WidgetTester tester) async {
+    testWidgets('should enable generate button with sufficient materials', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -323,12 +357,15 @@ void main() {
 
       // Should have 2 pre-selected materials, button should be enabled
       final generateButton = find.byType(ElevatedButton);
-      expect(tester.widget<ElevatedButton>(generateButton).onPressed, isNotNull);
+      expect(
+        tester.widget<ElevatedButton>(generateButton).onPressed,
+        isNotNull,
+      );
     });
 
     testWidgets('should handle close button', (WidgetTester tester) async {
       bool dialogClosed = false;
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -394,11 +431,16 @@ void main() {
       await tester.pumpAndSettle();
 
       // Values should have changed from defaults
-      expect(find.textContaining('30 minutes'), findsNothing); // Default prep time
+      expect(
+        find.textContaining('30 minutes'),
+        findsNothing,
+      ); // Default prep time
       expect(find.textContaining('500 cal'), findsNothing); // Default calories
     });
 
-    testWidgets('should use initial meal type when provided', (WidgetTester tester) async {
+    testWidgets('should use initial meal type when provided', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -418,7 +460,7 @@ void main() {
       // Breakfast should be selected
       // Verify breakfast is the default by checking internal state
       await tester.pumpAndSettle();
-      
+
       // We can verify this through the UI or by checking the summary display
     });
   });

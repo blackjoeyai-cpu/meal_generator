@@ -19,29 +19,30 @@ class CustomMealGenerationDialog extends StatefulWidget {
   });
 
   @override
-  State<CustomMealGenerationDialog> createState() => _CustomMealGenerationDialogState();
+  State<CustomMealGenerationDialog> createState() =>
+      _CustomMealGenerationDialogState();
 }
 
 class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
     with TickerProviderStateMixin {
   late TabController _tabController;
-  
+
   // Selected data
   final Set<String> _selectedMaterialIds = {};
   models.MealType _selectedMealType = models.MealType.lunch;
   final Set<String> _selectedDietaryRestrictions = {};
   final Set<String> _selectedCuisineTypes = {};
-  
+
   // Form data
   String _mealName = '';
   String _mealDescription = '';
   int _preparationTime = 30;
   int _targetCalories = 500;
-  
+
   // State
   bool _isGenerating = false;
   String? _errorMessage;
-  
+
   // Available options
   final List<String> _dietaryRestrictions = [
     'Vegetarian',
@@ -53,7 +54,7 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
     'Low-Fat',
     'High-Protein',
   ];
-  
+
   final List<String> _cuisineTypes = [
     'Italian',
     'Asian',
@@ -69,11 +70,11 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
-    
+
     if (widget.initialMealType != null) {
       _selectedMealType = widget.initialMealType!;
     }
-    
+
     // Pre-select some materials if available
     if (widget.availableMaterials.length >= 2) {
       _selectedMaterialIds.addAll(
@@ -99,10 +100,10 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
           children: [
             // Header
             _buildHeader(),
-            
+
             // Tab Bar
             _buildTabBar(),
-            
+
             // Tab Content
             Expanded(
               child: TabBarView(
@@ -115,7 +116,7 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
                 ],
               ),
             ),
-            
+
             // Actions
             _buildActions(),
           ],
@@ -167,7 +168,7 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
     final selectedMaterials = widget.availableMaterials
         .where((m) => _selectedMaterialIds.contains(m.id))
         .toList();
-        
+
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.md),
       child: Column(
@@ -194,9 +195,9 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
               ],
             ),
           ),
-          
+
           const SizedBox(height: AppSpacing.md),
-          
+
           // Selected materials chips
           if (selectedMaterials.isNotEmpty) ...[
             Text('Selected Materials:', style: AppTypography.titleMedium),
@@ -217,18 +218,18 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
             ),
             const SizedBox(height: AppSpacing.md),
           ],
-          
+
           // Available materials list
           Text('Available Materials:', style: AppTypography.titleMedium),
           const SizedBox(height: AppSpacing.sm),
-          
+
           Expanded(
             child: ListView.builder(
               itemCount: widget.availableMaterials.length,
               itemBuilder: (context, index) {
                 final material = widget.availableMaterials[index];
                 final isSelected = _selectedMaterialIds.contains(material.id);
-                
+
                 return CheckboxListTile(
                   value: isSelected,
                   onChanged: (value) {
@@ -270,7 +271,7 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
         children: [
           Text('Select Meal Type:', style: AppTypography.titleMedium),
           const SizedBox(height: AppSpacing.md),
-          
+
           ...models.MealType.values.map((mealType) {
             return Card(
               margin: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -287,8 +288,8 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: _selectedMealType == mealType 
-                            ? AppColors.primary 
+                        color: _selectedMealType == mealType
+                            ? AppColors.primary
                             : AppColors.surfaceVariant,
                         width: 2,
                       ),
@@ -323,13 +324,13 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
               ),
             );
           }),
-          
+
           const SizedBox(height: AppSpacing.lg),
-          
+
           // Preparation time and calories
           Text('Meal Parameters:', style: AppTypography.titleMedium),
           const SizedBox(height: AppSpacing.md),
-          
+
           Card(
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.md),
@@ -354,10 +355,13 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
                       });
                     },
                   ),
-                  
+
                   Row(
                     children: [
-                      Icon(Icons.local_fire_department, color: AppColors.primary),
+                      Icon(
+                        Icons.local_fire_department,
+                        color: AppColors.primary,
+                      ),
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(child: Text('Target Calories')),
                       Text('$_targetCalories cal'),
@@ -393,7 +397,7 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
             // Dietary Restrictions
             Text('Dietary Restrictions:', style: AppTypography.titleMedium),
             const SizedBox(height: AppSpacing.sm),
-            
+
             ...List.generate(_dietaryRestrictions.length, (index) {
               final restriction = _dietaryRestrictions[index];
               return CheckboxListTile(
@@ -411,13 +415,13 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
                 dense: true,
               );
             }),
-            
+
             const SizedBox(height: AppSpacing.lg),
-            
+
             // Cuisine Types
             Text('Cuisine Preferences:', style: AppTypography.titleMedium),
             const SizedBox(height: AppSpacing.sm),
-            
+
             Wrap(
               spacing: AppSpacing.xs,
               children: _cuisineTypes.map((cuisine) {
@@ -451,7 +455,7 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
         children: [
           Text('Meal Details (Optional):', style: AppTypography.titleMedium),
           const SizedBox(height: AppSpacing.md),
-          
+
           TextFormField(
             decoration: const InputDecoration(
               labelText: 'Meal Name',
@@ -460,9 +464,9 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
             ),
             onChanged: (value) => _mealName = value,
           ),
-          
+
           const SizedBox(height: AppSpacing.md),
-          
+
           TextFormField(
             decoration: const InputDecoration(
               labelText: 'Description',
@@ -472,9 +476,9 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
             maxLines: 3,
             onChanged: (value) => _mealDescription = value,
           ),
-          
+
           const SizedBox(height: AppSpacing.lg),
-          
+
           // Generation Summary
           Card(
             child: Padding(
@@ -484,22 +488,31 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
                 children: [
                   Text('Generation Summary:', style: AppTypography.titleMedium),
                   const SizedBox(height: AppSpacing.sm),
-                  
-                  _buildSummaryRow('Materials', '${_selectedMaterialIds.length} selected'),
+
+                  _buildSummaryRow(
+                    'Materials',
+                    '${_selectedMaterialIds.length} selected',
+                  ),
                   _buildSummaryRow('Meal Type', _selectedMealType.displayName),
                   _buildSummaryRow('Prep Time', '$_preparationTime minutes'),
                   _buildSummaryRow('Target Calories', '$_targetCalories cal'),
-                  
+
                   if (_selectedDietaryRestrictions.isNotEmpty)
-                    _buildSummaryRow('Dietary', _selectedDietaryRestrictions.join(', ')),
-                    
+                    _buildSummaryRow(
+                      'Dietary',
+                      _selectedDietaryRestrictions.join(', '),
+                    ),
+
                   if (_selectedCuisineTypes.isNotEmpty)
-                    _buildSummaryRow('Cuisine', _selectedCuisineTypes.join(', ')),
+                    _buildSummaryRow(
+                      'Cuisine',
+                      _selectedCuisineTypes.join(', '),
+                    ),
                 ],
               ),
             ),
           ),
-          
+
           if (_errorMessage != null) ...[
             const SizedBox(height: AppSpacing.md),
             Container(
@@ -527,7 +540,10 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
       padding: const EdgeInsets.only(bottom: AppSpacing.xs),
       child: Row(
         children: [
-          SizedBox(width: 100, child: Text('$label:', style: AppTypography.bodySmall)),
+          SizedBox(
+            width: 100,
+            child: Text('$label:', style: AppTypography.bodySmall),
+          ),
           Expanded(child: Text(value, style: AppTypography.bodyMedium)),
         ],
       ),
@@ -536,7 +552,7 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
 
   Widget _buildActions() {
     final canGenerate = _selectedMaterialIds.length >= 2;
-    
+
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.md),
       child: Row(
@@ -545,12 +561,12 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
             onPressed: _isGenerating ? null : () => Navigator.of(context).pop(),
             child: const Text('Cancel'),
           ),
-          
+
           const Spacer(),
-          
+
           ElevatedButton.icon(
             onPressed: canGenerate && !_isGenerating ? _generateMeal : null,
-            icon: _isGenerating 
+            icon: _isGenerating
                 ? const SizedBox(
                     width: 16,
                     height: 16,
@@ -576,7 +592,7 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
           .toList();
 
       final mealGeneratorService = MealGeneratorService();
-      
+
       final meal = await mealGeneratorService.generateCustomMealEnhanced(
         materials: selectedMaterials,
         mealType: _selectedMealType,
@@ -591,7 +607,7 @@ class _CustomMealGenerationDialogState extends State<CustomMealGenerationDialog>
       if (mounted) {
         widget.onMealGenerated(meal);
         Navigator.of(context).pop();
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Custom meal "${meal.name}" generated successfully!'),

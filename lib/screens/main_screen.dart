@@ -8,6 +8,8 @@ import '../utils/utils.dart';
 import '../widgets/calendar_view.dart';
 import '../widgets/materials_panel.dart';
 import '../widgets/meal_plan_view.dart';
+import '../widgets/dialogs/add_material_dialog.dart';
+import '../widgets/dialogs/settings_dialog.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -219,8 +221,13 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   }
 
   void _showAddMaterialDialog() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Add material functionality coming soon!')),
+    showDialog(
+      context: context,
+      builder: (context) => AddMaterialDialog(
+        onMaterialAdded: (material) {
+          context.read<MaterialsProvider>().addMaterial(material);
+        },
+      ),
     );
   }
 
@@ -250,19 +257,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   }
 
   void _showSettingsDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Settings'),
-        content: const Text('Settings functionality coming soon!'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
+    showDialog(context: context, builder: (context) => const SettingsDialog());
   }
 
   void _showAboutDialog() {

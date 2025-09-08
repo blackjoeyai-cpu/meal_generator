@@ -46,7 +46,9 @@ void main() {
       expect(find.text('ID: test-id-123'), findsOneWidget);
     });
 
-    testWidgets('should populate form fields with existing data', (WidgetTester tester) async {
+    testWidgets('should populate form fields with existing data', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -66,7 +68,7 @@ void main() {
 
       // Check that vegetables category is selected (internal state check)
       await tester.pumpAndSettle();
-      
+
       // We verify this through UI behavior since the custom radio button state is internal
 
       // Check that availability switch is on
@@ -75,7 +77,9 @@ void main() {
       expect(switchWidget.value, true);
     });
 
-    testWidgets('should detect changes and enable save button', (WidgetTester tester) async {
+    testWidgets('should detect changes and enable save button', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -88,14 +92,23 @@ void main() {
       );
 
       // Initially, save button should be disabled (no changes)
-      expect(tester.widget<ElevatedButton>(find.byType(ElevatedButton)).onPressed, null);
+      expect(
+        tester.widget<ElevatedButton>(find.byType(ElevatedButton)).onPressed,
+        null,
+      );
 
       // Make a change to the name
-      await tester.enterText(find.byType(TextFormField).first, 'Modified Material');
+      await tester.enterText(
+        find.byType(TextFormField).first,
+        'Modified Material',
+      );
       await tester.pump();
 
       // Save button should now be enabled
-      expect(tester.widget<ElevatedButton>(find.byType(ElevatedButton)).onPressed, isNotNull);
+      expect(
+        tester.widget<ElevatedButton>(find.byType(ElevatedButton)).onPressed,
+        isNotNull,
+      );
 
       // Should show changes indicator
       expect(find.text('You have unsaved changes'), findsOneWidget);
@@ -136,16 +149,29 @@ void main() {
       );
 
       // Modify multiple fields
-      await tester.enterText(find.byType(TextFormField).first, 'Modified Material');
-      await tester.enterText(find.byType(TextFormField).at(1), 'Modified description');
-      await tester.enterText(find.byType(TextFormField).at(2), 'High protein, Low fat');
+      await tester.enterText(
+        find.byType(TextFormField).first,
+        'Modified Material',
+      );
+      await tester.enterText(
+        find.byType(TextFormField).at(1),
+        'Modified description',
+      );
+      await tester.enterText(
+        find.byType(TextFormField).at(2),
+        'High protein, Low fat',
+      );
 
       // Change category to meat by finding the meat list tile
       final meatTile = find.byWidgetPredicate(
-        (widget) => widget is ListTile &&
+        (widget) =>
+            widget is ListTile &&
             widget.title is Row &&
-            ((widget.title as Row).children.any((child) => 
-                child is Text && child.data == models.MaterialCategory.meat.displayName)),
+            ((widget.title as Row).children.any(
+              (child) =>
+                  child is Text &&
+                  child.data == models.MaterialCategory.meat.displayName,
+            )),
       );
       await tester.tap(meatTile);
       await tester.pumpAndSettle();
@@ -168,7 +194,47 @@ void main() {
       expect(capturedMaterial.isAvailable, false);
     });
 
-    testWidgets('should show discard changes dialog when cancelling with changes', (WidgetTester tester) async {
+    testWidgets(
+      'should show discard changes dialog when cancelling with changes',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: EditMaterialDialog(
+                material: testMaterial,
+                onMaterialUpdated: onMaterialUpdated,
+              ),
+            ),
+          ),
+        );
+
+        // Make a change
+        await tester.enterText(
+          find.byType(TextFormField).first,
+          'Modified Material',
+        );
+        await tester.pump();
+
+        // Try to cancel
+        await tester.tap(find.text('Cancel'));
+        await tester.pumpAndSettle();
+
+        // Should show discard changes dialog
+        expect(find.text('Discard Changes?'), findsOneWidget);
+        expect(
+          find.text(
+            'You have unsaved changes. Are you sure you want to discard them?',
+          ),
+          findsOneWidget,
+        );
+        expect(find.text('Keep Editing'), findsOneWidget);
+        expect(find.text('Discard'), findsOneWidget);
+      },
+    );
+
+    testWidgets('should keep editing when choosing to keep changes', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -181,34 +247,10 @@ void main() {
       );
 
       // Make a change
-      await tester.enterText(find.byType(TextFormField).first, 'Modified Material');
-      await tester.pump();
-
-      // Try to cancel
-      await tester.tap(find.text('Cancel'));
-      await tester.pumpAndSettle();
-
-      // Should show discard changes dialog
-      expect(find.text('Discard Changes?'), findsOneWidget);
-      expect(find.text('You have unsaved changes. Are you sure you want to discard them?'), findsOneWidget);
-      expect(find.text('Keep Editing'), findsOneWidget);
-      expect(find.text('Discard'), findsOneWidget);
-    });
-
-    testWidgets('should keep editing when choosing to keep changes', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: EditMaterialDialog(
-              material: testMaterial,
-              onMaterialUpdated: onMaterialUpdated,
-            ),
-          ),
-        ),
+      await tester.enterText(
+        find.byType(TextFormField).first,
+        'Modified Material',
       );
-
-      // Make a change
-      await tester.enterText(find.byType(TextFormField).first, 'Modified Material');
       await tester.pump();
 
       // Try to cancel
@@ -224,9 +266,11 @@ void main() {
       expect(find.text('Modified Material'), findsOneWidget);
     });
 
-    testWidgets('should cancel directly when no changes made', (WidgetTester tester) async {
+    testWidgets('should cancel directly when no changes made', (
+      WidgetTester tester,
+    ) async {
       bool dialogClosed = false;
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -261,7 +305,9 @@ void main() {
       expect(onMaterialUpdatedCalled, false);
     });
 
-    testWidgets('should handle empty optional fields correctly', (WidgetTester tester) async {
+    testWidgets('should handle empty optional fields correctly', (
+      WidgetTester tester,
+    ) async {
       final materialWithoutOptionalFields = const models.Material(
         id: 'test-id-456',
         name: 'Basic Material',
@@ -283,16 +329,29 @@ void main() {
 
       // Check that empty fields are handled correctly
       final textFields = find.byType(TextFormField);
-      expect(tester.widget<TextFormField>(textFields.at(1)).controller?.text, ''); // description
-      expect(tester.widget<TextFormField>(textFields.at(2)).controller?.text, ''); // nutritional info
-      expect(tester.widget<TextFormField>(textFields.at(3)).controller?.text, ''); // image URL
+      expect(
+        tester.widget<TextFormField>(textFields.at(1)).controller?.text,
+        '',
+      ); // description
+      expect(
+        tester.widget<TextFormField>(textFields.at(2)).controller?.text,
+        '',
+      ); // nutritional info
+      expect(
+        tester.widget<TextFormField>(textFields.at(3)).controller?.text,
+        '',
+      ); // image URL
 
       // Availability should be false
-      final switchWidget = tester.widget<SwitchListTile>(find.byType(SwitchListTile));
+      final switchWidget = tester.widget<SwitchListTile>(
+        find.byType(SwitchListTile),
+      );
       expect(switchWidget.value, false);
     });
 
-    testWidgets('should show loading state during update', (WidgetTester tester) async {
+    testWidgets('should show loading state during update', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -310,7 +369,10 @@ void main() {
       );
 
       // Make a change
-      await tester.enterText(find.byType(TextFormField).first, 'Modified Material');
+      await tester.enterText(
+        find.byType(TextFormField).first,
+        'Modified Material',
+      );
 
       // Submit
       await tester.tap(find.text('Save Changes'));
@@ -321,7 +383,9 @@ void main() {
       expect(find.text('Save Changes'), findsNothing);
     });
 
-    testWidgets('should maintain correct category selection state', (WidgetTester tester) async {
+    testWidgets('should maintain correct category selection state', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -339,17 +403,21 @@ void main() {
 
       // Check vegetables and dairy selections through UI behavior
       await tester.pumpAndSettle();
-      
+
       // Select different category by finding dairy list tile
       final dairyTile = find.byWidgetPredicate(
-        (widget) => widget is ListTile &&
+        (widget) =>
+            widget is ListTile &&
             widget.title is Row &&
-            ((widget.title as Row).children.any((child) => 
-                child is Text && child.data == models.MaterialCategory.dairy.displayName)),
+            ((widget.title as Row).children.any(
+              (child) =>
+                  child is Text &&
+                  child.data == models.MaterialCategory.dairy.displayName,
+            )),
       );
       await tester.tap(dairyTile);
       await tester.pumpAndSettle();
-      
+
       // Verify selection through UI behavior - the custom radio button state is internal
     });
   });

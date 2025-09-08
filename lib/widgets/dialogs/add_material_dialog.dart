@@ -8,10 +8,7 @@ import '../../utils/utils.dart';
 class AddMaterialDialog extends StatefulWidget {
   final Function(models.Material) onMaterialAdded;
 
-  const AddMaterialDialog({
-    super.key,
-    required this.onMaterialAdded,
-  });
+  const AddMaterialDialog({super.key, required this.onMaterialAdded});
 
   @override
   State<AddMaterialDialog> createState() => _AddMaterialDialogState();
@@ -24,7 +21,8 @@ class _AddMaterialDialogState extends State<AddMaterialDialog> {
   final _imageUrlController = TextEditingController();
   final _nutritionalInfoController = TextEditingController();
 
-  models.MaterialCategory _selectedCategory = models.MaterialCategory.vegetables;
+  models.MaterialCategory _selectedCategory =
+      models.MaterialCategory.vegetables;
   bool _isAvailable = true;
   bool _isLoading = false;
 
@@ -158,8 +156,8 @@ class _AddMaterialDialogState extends State<AddMaterialDialog> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: _selectedCategory == category 
-                            ? AppColors.primary 
+                        color: _selectedCategory == category
+                            ? AppColors.primary
                             : AppColors.surfaceVariant,
                         width: 2,
                       ),

@@ -24,9 +24,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: AddMaterialDialog(
-              onMaterialAdded: onMaterialAdded,
-            ),
+            body: AddMaterialDialog(onMaterialAdded: onMaterialAdded),
           ),
         ),
       );
@@ -39,19 +37,19 @@ void main() {
       expect(find.text('Nutritional Information'), findsOneWidget);
       expect(find.text('Image URL'), findsOneWidget);
       expect(find.text('Available'), findsOneWidget);
-      
+
       // Check action buttons
       expect(find.text('Cancel'), findsOneWidget);
       expect(find.text('Add Material'), findsOneWidget);
     });
 
-    testWidgets('should validate required material name', (WidgetTester tester) async {
+    testWidgets('should validate required material name', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: AddMaterialDialog(
-              onMaterialAdded: onMaterialAdded,
-            ),
+            body: AddMaterialDialog(onMaterialAdded: onMaterialAdded),
           ),
         ),
       );
@@ -64,13 +62,13 @@ void main() {
       expect(onMaterialAddedCalled, false);
     });
 
-    testWidgets('should validate minimum name length', (WidgetTester tester) async {
+    testWidgets('should validate minimum name length', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: AddMaterialDialog(
-              onMaterialAdded: onMaterialAdded,
-            ),
+            body: AddMaterialDialog(onMaterialAdded: onMaterialAdded),
           ),
         ),
       );
@@ -80,16 +78,19 @@ void main() {
       await tester.tap(find.text('Add Material'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Material name must be at least 2 characters'), findsOneWidget);
+      expect(
+        find.text('Material name must be at least 2 characters'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('should validate maximum name length', (WidgetTester tester) async {
+    testWidgets('should validate maximum name length', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: AddMaterialDialog(
-              onMaterialAdded: onMaterialAdded,
-            ),
+            body: AddMaterialDialog(onMaterialAdded: onMaterialAdded),
           ),
         ),
       );
@@ -100,23 +101,26 @@ void main() {
       await tester.tap(find.text('Add Material'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Material name must be less than 50 characters'), findsOneWidget);
+      expect(
+        find.text('Material name must be less than 50 characters'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('should validate description length', (WidgetTester tester) async {
+    testWidgets('should validate description length', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: AddMaterialDialog(
-              onMaterialAdded: onMaterialAdded,
-            ),
+            body: AddMaterialDialog(onMaterialAdded: onMaterialAdded),
           ),
         ),
       );
 
       // Enter valid name first
       await tester.enterText(find.byType(TextFormField).first, 'Test Material');
-      
+
       // Enter description longer than 200 characters
       final longDescription = 'A' * 201;
       final descriptionField = find.byType(TextFormField).at(1);
@@ -124,23 +128,26 @@ void main() {
       await tester.tap(find.text('Add Material'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Description must be less than 200 characters'), findsOneWidget);
+      expect(
+        find.text('Description must be less than 200 characters'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('should validate nutritional info count', (WidgetTester tester) async {
+    testWidgets('should validate nutritional info count', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: AddMaterialDialog(
-              onMaterialAdded: onMaterialAdded,
-            ),
+            body: AddMaterialDialog(onMaterialAdded: onMaterialAdded),
           ),
         ),
       );
 
       // Enter valid name
       await tester.enterText(find.byType(TextFormField).first, 'Test Material');
-      
+
       // Enter more than 10 nutritional info items
       final manyItems = List.generate(11, (i) => 'Item $i').join(', ');
       final nutritionalField = find.byType(TextFormField).at(2);
@@ -148,23 +155,24 @@ void main() {
       await tester.tap(find.text('Add Material'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Maximum 10 nutritional info items allowed'), findsOneWidget);
+      expect(
+        find.text('Maximum 10 nutritional info items allowed'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('should validate URL format', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: AddMaterialDialog(
-              onMaterialAdded: onMaterialAdded,
-            ),
+            body: AddMaterialDialog(onMaterialAdded: onMaterialAdded),
           ),
         ),
       );
 
       // Enter valid name
       await tester.enterText(find.byType(TextFormField).first, 'Test Material');
-      
+
       // Enter invalid URL
       final urlField = find.byType(TextFormField).at(3);
       await tester.enterText(urlField, 'invalid-url');
@@ -178,36 +186,37 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: AddMaterialDialog(
-              onMaterialAdded: onMaterialAdded,
-            ),
+            body: AddMaterialDialog(onMaterialAdded: onMaterialAdded),
           ),
         ),
       );
 
       // Check that we have 7 category options (now as ListTiles)
-      expect(find.byType(ListTile), findsNWidgets(8)); // 7 categories + 1 availability switch
-      
+      expect(
+        find.byType(ListTile),
+        findsNWidgets(8),
+      ); // 7 categories + 1 availability switch
+
       // Find meat category by text and tap it
       final meatText = find.text('Meat');
       await tester.tap(meatText);
       await tester.pumpAndSettle();
-      
+
       // Verify meat is now selected by checking if any custom radio button shows selected state
       // We can verify this by checking the state through the UI behavior
       await tester.pumpAndSettle();
-      
+
       // The selection state is internal, so we verify by attempting to submit
       // and checking that the material was created with the correct category
     });
 
-    testWidgets('should toggle availability switch', (WidgetTester tester) async {
+    testWidgets('should toggle availability switch', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: AddMaterialDialog(
-              onMaterialAdded: onMaterialAdded,
-            ),
+            body: AddMaterialDialog(onMaterialAdded: onMaterialAdded),
           ),
         ),
       );
@@ -215,35 +224,44 @@ void main() {
       // Find availability switch (should be true by default)
       final switchTile = find.byType(SwitchListTile);
       expect(switchTile, findsOneWidget);
-      
+
       final switchWidget = tester.widget<SwitchListTile>(switchTile);
       expect(switchWidget.value, true);
-      
+
       // Tap to toggle
       await tester.tap(switchTile);
       await tester.pumpAndSettle();
-      
+
       // Verify it's now false
       final updatedSwitchWidget = tester.widget<SwitchListTile>(switchTile);
       expect(updatedSwitchWidget.value, false);
     });
 
-    testWidgets('should create material with valid data', (WidgetTester tester) async {
+    testWidgets('should create material with valid data', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: AddMaterialDialog(
-              onMaterialAdded: onMaterialAdded,
-            ),
+            body: AddMaterialDialog(onMaterialAdded: onMaterialAdded),
           ),
         ),
       );
 
       // Fill in valid data
       await tester.enterText(find.byType(TextFormField).first, 'Test Material');
-      await tester.enterText(find.byType(TextFormField).at(1), 'Test description');
-      await tester.enterText(find.byType(TextFormField).at(2), 'High protein, Low fat');
-      await tester.enterText(find.byType(TextFormField).at(3), 'https://example.com/image.jpg');
+      await tester.enterText(
+        find.byType(TextFormField).at(1),
+        'Test description',
+      );
+      await tester.enterText(
+        find.byType(TextFormField).at(2),
+        'High protein, Low fat',
+      );
+      await tester.enterText(
+        find.byType(TextFormField).at(3),
+        'https://example.com/image.jpg',
+      );
 
       // Find meat category by looking for text 'Meat' in any widget
       final meatText = find.text('Meat');
@@ -267,7 +285,7 @@ void main() {
 
     testWidgets('should handle cancel button', (WidgetTester tester) async {
       bool dialogClosed = false;
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -276,9 +294,8 @@ void main() {
                 onPressed: () {
                   showDialog(
                     context: context,
-                    builder: (context) => AddMaterialDialog(
-                      onMaterialAdded: onMaterialAdded,
-                    ),
+                    builder: (context) =>
+                        AddMaterialDialog(onMaterialAdded: onMaterialAdded),
                   ).then((_) => dialogClosed = true);
                 },
                 child: const Text('Open Dialog'),
@@ -301,7 +318,9 @@ void main() {
       expect(onMaterialAddedCalled, false);
     });
 
-    testWidgets('should show loading state during submission', (WidgetTester tester) async {
+    testWidgets('should show loading state during submission', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -329,13 +348,13 @@ void main() {
       expect(find.text('Add Material'), findsNothing);
     });
 
-    testWidgets('should parse nutritional info correctly', (WidgetTester tester) async {
+    testWidgets('should parse nutritional info correctly', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: AddMaterialDialog(
-              onMaterialAdded: onMaterialAdded,
-            ),
+            body: AddMaterialDialog(onMaterialAdded: onMaterialAdded),
           ),
         ),
       );
@@ -343,7 +362,7 @@ void main() {
       // Fill in data with complex nutritional info
       await tester.enterText(find.byType(TextFormField).first, 'Test Material');
       await tester.enterText(
-        find.byType(TextFormField).at(2), 
+        find.byType(TextFormField).at(2),
         'High protein,  Low fat , Vitamin C,, Iron',
       );
 
@@ -353,7 +372,12 @@ void main() {
 
       // Verify nutritional info was parsed correctly (trimmed and empty items removed)
       expect(onMaterialAddedCalled, true);
-      expect(capturedMaterial.nutritionalInfo, ['High protein', 'Low fat', 'Vitamin C', 'Iron']);
+      expect(capturedMaterial.nutritionalInfo, [
+        'High protein',
+        'Low fat',
+        'Vitamin C',
+        'Iron',
+      ]);
     });
   });
 }

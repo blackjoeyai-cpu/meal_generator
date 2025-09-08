@@ -75,6 +75,66 @@ class MealGeneratorService {
     }
   }
 
+  // Generate a custom meal with enhanced parameters
+  Future<Meal> generateCustomMealEnhanced({
+    required List<Material> materials,
+    required MealType mealType,
+    List<String>? dietaryRestrictions,
+    List<String>? cuisinePreferences,
+    int? targetCalories,
+    int? preparationTime,
+    String? customName,
+    String? customDescription,
+  }) async {
+    try {
+      if (materials.isEmpty) {
+        throw Exception('At least one material must be provided');
+      }
+
+      // Filter materials based on dietary restrictions
+      final filteredMaterials = _filterMaterialsByDietaryRestrictions(
+        materials,
+        dietaryRestrictions,
+      );
+
+      if (filteredMaterials.isEmpty) {
+        throw Exception(
+          'No materials available after applying dietary restrictions',
+        );
+      }
+
+      // Generate the meal
+      final meal = await _generateSingleMeal(
+        availableMaterials: filteredMaterials,
+        mealType: mealType,
+        usedCombinations: {},
+        dietaryRestrictions: dietaryRestrictions,
+        requiredMaterials: filteredMaterials,
+      );
+
+      if (meal == null) {
+        throw Exception('Failed to generate meal with provided materials');
+      }
+
+      // Apply custom parameters
+      return meal.copyWith(
+        name: customName?.isNotEmpty == true ? customName : meal.name,
+        description: customDescription?.isNotEmpty == true
+            ? customDescription
+            : meal.description,
+        calories: targetCalories ?? meal.calories,
+        preparationTime: preparationTime ?? meal.preparationTime,
+        tags: [
+          ...meal.tags,
+          if (cuisinePreferences != null)
+            ...cuisinePreferences.map((c) => c.toLowerCase()),
+        ],
+      );
+    } catch (e) {
+      throw Exception('Failed to generate enhanced custom meal: $e');
+    }
+  }
+
   // Generate weekly meal plan
   Future<Map<DateTime, MealPlan>> generateWeeklyPlan({
     required DateTime startDate,

@@ -9,10 +9,7 @@ import '../../utils/utils.dart';
 class ShareMealPlanDialog extends StatefulWidget {
   final models.MealPlan mealPlan;
 
-  const ShareMealPlanDialog({
-    super.key,
-    required this.mealPlan,
-  });
+  const ShareMealPlanDialog({super.key, required this.mealPlan});
 
   @override
   State<ShareMealPlanDialog> createState() => _ShareMealPlanDialogState();
@@ -42,19 +39,19 @@ class _ShareMealPlanDialogState extends State<ShareMealPlanDialog> {
           children: [
             // Meal plan info
             _buildMealPlanInfo(),
-            
+
             const SizedBox(height: AppSpacing.lg),
-            
+
             // Share format selection
             _buildFormatSelection(),
-            
+
             const SizedBox(height: AppSpacing.lg),
-            
+
             // Content options
             _buildContentOptions(),
-            
+
             const SizedBox(height: AppSpacing.lg),
-            
+
             // Preview
             _buildPreview(),
           ],
@@ -100,7 +97,7 @@ class _ShareMealPlanDialogState extends State<ShareMealPlanDialog> {
             style: AppTypography.titleMedium,
           ),
           const SizedBox(height: AppSpacing.sm),
-          
+
           Row(
             children: [
               _buildInfoChip(
@@ -156,7 +153,7 @@ class _ShareMealPlanDialogState extends State<ShareMealPlanDialog> {
       children: [
         Text('Share Format:', style: AppTypography.titleMedium),
         const SizedBox(height: AppSpacing.sm),
-        
+
         Row(
           children: [
             Expanded(
@@ -173,8 +170,8 @@ class _ShareMealPlanDialogState extends State<ShareMealPlanDialog> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: _shareFormat == 'text' 
-                            ? AppColors.primary 
+                        color: _shareFormat == 'text'
+                            ? AppColors.primary
                             : AppColors.surfaceVariant,
                         width: 2,
                       ),
@@ -218,8 +215,8 @@ class _ShareMealPlanDialogState extends State<ShareMealPlanDialog> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: _shareFormat == 'formatted' 
-                            ? AppColors.primary 
+                        color: _shareFormat == 'formatted'
+                            ? AppColors.primary
                             : AppColors.surfaceVariant,
                         width: 2,
                       ),
@@ -261,7 +258,7 @@ class _ShareMealPlanDialogState extends State<ShareMealPlanDialog> {
       children: [
         Text('Include in Share:', style: AppTypography.titleMedium),
         const SizedBox(height: AppSpacing.sm),
-        
+
         CheckboxListTile(
           title: const Text('Cooking Instructions'),
           value: _includeInstructions,
@@ -273,7 +270,7 @@ class _ShareMealPlanDialogState extends State<ShareMealPlanDialog> {
           dense: true,
           contentPadding: EdgeInsets.zero,
         ),
-        
+
         CheckboxListTile(
           title: const Text('Materials List'),
           value: _includeMaterials,
@@ -285,7 +282,7 @@ class _ShareMealPlanDialogState extends State<ShareMealPlanDialog> {
           dense: true,
           contentPadding: EdgeInsets.zero,
         ),
-        
+
         CheckboxListTile(
           title: const Text('Nutrition Information'),
           value: _includeNutrition,
@@ -307,7 +304,7 @@ class _ShareMealPlanDialogState extends State<ShareMealPlanDialog> {
       children: [
         Text('Preview:', style: AppTypography.titleMedium),
         const SizedBox(height: AppSpacing.sm),
-        
+
         Container(
           width: double.infinity,
           height: 150,
@@ -319,9 +316,7 @@ class _ShareMealPlanDialogState extends State<ShareMealPlanDialog> {
           child: SingleChildScrollView(
             child: Text(
               _generateShareContent(),
-              style: AppTypography.bodySmall.copyWith(
-                fontFamily: 'monospace',
-              ),
+              style: AppTypography.bodySmall.copyWith(fontFamily: 'monospace'),
             ),
           ),
         ),
@@ -331,7 +326,7 @@ class _ShareMealPlanDialogState extends State<ShareMealPlanDialog> {
 
   String _generateShareContent() {
     final buffer = StringBuffer();
-    
+
     if (_shareFormat == 'formatted') {
       buffer.writeln('🍽️ MEAL PLAN');
       buffer.writeln('═' * 20);
@@ -339,7 +334,7 @@ class _ShareMealPlanDialogState extends State<ShareMealPlanDialog> {
       buffer.writeln('MEAL PLAN');
       buffer.writeln('=' * 20);
     }
-    
+
     buffer.writeln('Date: ${_getFormattedDate(widget.mealPlan.date)}');
     buffer.writeln();
 
@@ -348,15 +343,18 @@ class _ShareMealPlanDialogState extends State<ShareMealPlanDialog> {
       final meal = widget.mealPlan.getMeal(mealType);
       if (meal != null) {
         if (_shareFormat == 'formatted') {
-          buffer.writeln('${mealType.emoji} ${mealType.displayName.toUpperCase()}');
+          buffer.writeln(
+            '${mealType.emoji} ${mealType.displayName.toUpperCase()}',
+          );
         } else {
           buffer.writeln(mealType.displayName.toUpperCase());
         }
-        
+
         buffer.writeln('• ${meal.name}');
         buffer.writeln('  ${meal.description}');
-        
-        if (_includeNutrition && (meal.calories != null || meal.preparationTime > 0)) {
+
+        if (_includeNutrition &&
+            (meal.calories != null || meal.preparationTime > 0)) {
           buffer.write('  ');
           if (meal.preparationTime > 0) {
             buffer.write('Prep: ${meal.preparationTime} min');
@@ -367,11 +365,13 @@ class _ShareMealPlanDialogState extends State<ShareMealPlanDialog> {
           }
           buffer.writeln();
         }
-        
+
         if (_includeMaterials && meal.materials.isNotEmpty) {
-          buffer.writeln('  Materials: ${meal.materials.map((m) => m.name).join(', ')}');
+          buffer.writeln(
+            '  Materials: ${meal.materials.map((m) => m.name).join(', ')}',
+          );
         }
-        
+
         if (_includeInstructions && meal.instructions.isNotEmpty) {
           final instructions = meal.instructions.split('\n');
           for (final instruction in instructions) {
@@ -380,7 +380,7 @@ class _ShareMealPlanDialogState extends State<ShareMealPlanDialog> {
             }
           }
         }
-        
+
         buffer.writeln();
       }
     }
@@ -393,14 +393,16 @@ class _ShareMealPlanDialogState extends State<ShareMealPlanDialog> {
       buffer.writeln('SUMMARY');
       buffer.writeln('-' * 20);
     }
-    
+
     buffer.writeln('Total meals: ${widget.mealPlan.allMeals.length}');
-    buffer.writeln('Total prep time: ${widget.mealPlan.totalPreparationTime} minutes');
-    
+    buffer.writeln(
+      'Total prep time: ${widget.mealPlan.totalPreparationTime} minutes',
+    );
+
     if (widget.mealPlan.totalCalories != null) {
       buffer.writeln('Total calories: ${widget.mealPlan.totalCalories}');
     }
-    
+
     buffer.writeln();
     buffer.writeln('Generated by Meal Planner App');
 
@@ -409,12 +411,27 @@ class _ShareMealPlanDialogState extends State<ShareMealPlanDialog> {
 
   String _getFormattedDate(DateTime date) {
     const weekdays = [
-      'Monday', 'Tuesday', 'Wednesday', 'Thursday',
-      'Friday', 'Saturday', 'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
     ];
     const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December',
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
 
     return '${weekdays[date.weekday - 1]}, ${months[date.month - 1]} ${date.day}, ${date.year}';
@@ -423,7 +440,7 @@ class _ShareMealPlanDialogState extends State<ShareMealPlanDialog> {
   Future<void> _copyToClipboard() async {
     final content = _generateShareContent();
     await Clipboard.setData(ClipboardData(text: content));
-    
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -438,9 +455,9 @@ class _ShareMealPlanDialogState extends State<ShareMealPlanDialog> {
     // For now, just copy to clipboard
     // In a real app, you would use the share package
     _copyToClipboard();
-    
+
     Navigator.of(context).pop();
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Meal plan shared successfully!'),

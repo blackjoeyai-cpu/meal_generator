@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import '../providers/providers.dart';
 import '../models/models.dart' as models;
 import '../utils/utils.dart';
+import 'dialogs/add_material_dialog.dart';
+import 'dialogs/edit_material_dialog.dart';
 
 class MaterialsPanel extends StatefulWidget {
   const MaterialsPanel({super.key});
@@ -496,8 +498,13 @@ class _MaterialsPanelState extends State<MaterialsPanel> {
   }
 
   void _showAddMaterialDialog() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Add material dialog coming soon!')),
+    showDialog(
+      context: context,
+      builder: (context) => AddMaterialDialog(
+        onMaterialAdded: (material) {
+          context.read<MaterialsProvider>().addMaterial(material);
+        },
+      ),
     );
   }
 
@@ -505,8 +512,14 @@ class _MaterialsPanelState extends State<MaterialsPanel> {
     models.Material material,
     MaterialsProvider provider,
   ) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Edit ${material.name} coming soon!')),
+    showDialog(
+      context: context,
+      builder: (context) => EditMaterialDialog(
+        material: material,
+        onMaterialUpdated: (updatedMaterial) {
+          provider.updateMaterial(updatedMaterial);
+        },
+      ),
     );
   }
 

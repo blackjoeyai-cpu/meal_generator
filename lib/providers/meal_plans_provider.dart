@@ -226,6 +226,21 @@ class MealPlansProvider extends ChangeNotifier {
     }
   }
 
+  // Create a new meal plan with a specific meal
+  Future<void> createMealPlanWithMeal(DateTime date, Meal meal) async {
+    final newPlan = MealPlan(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      date: date,
+      meals: {
+        for (final type in MealType.values)
+          type: type == meal.mealType ? meal : null,
+      },
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+    await saveMealPlan(newPlan);
+  }
+
   // Set selected date
   void setSelectedDate(DateTime date) {
     if (_selectedDate != date) {

@@ -55,7 +55,9 @@ class _EditMaterialDialogState extends State<EditMaterialDialog> {
     _nameController.text = widget.material.name;
     _descriptionController.text = widget.material.description ?? '';
     _imageUrlController.text = widget.material.imageUrl ?? '';
-    _nutritionalInfoController.text = widget.material.nutritionalInfo.join(', ');
+    _nutritionalInfoController.text = widget.material.nutritionalInfo.join(
+      ', ',
+    );
     _selectedCategory = widget.material.category;
     _isAvailable = widget.material.isAvailable;
   }
@@ -68,9 +70,11 @@ class _EditMaterialDialogState extends State<EditMaterialDialog> {
 
   bool _checkForChanges() {
     return _nameController.text.trim() != widget.material.name ||
-        _descriptionController.text.trim() != (widget.material.description ?? '') ||
+        _descriptionController.text.trim() !=
+            (widget.material.description ?? '') ||
         _imageUrlController.text.trim() != (widget.material.imageUrl ?? '') ||
-        _nutritionalInfoController.text.trim() != widget.material.nutritionalInfo.join(', ') ||
+        _nutritionalInfoController.text.trim() !=
+            widget.material.nutritionalInfo.join(', ') ||
         _selectedCategory != widget.material.category ||
         _isAvailable != widget.material.isAvailable;
   }
@@ -236,8 +240,8 @@ class _EditMaterialDialogState extends State<EditMaterialDialog> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: _selectedCategory == category 
-                            ? AppColors.primary 
+                        color: _selectedCategory == category
+                            ? AppColors.primary
                             : AppColors.surfaceVariant,
                         width: 2,
                       ),

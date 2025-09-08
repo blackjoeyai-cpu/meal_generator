@@ -7,6 +7,10 @@ import '../providers/providers.dart';
 import '../models/models.dart' as models;
 import '../utils/utils.dart';
 import 'meal_card.dart';
+import 'dialogs/custom_meal_generation_dialog.dart';
+import 'dialogs/replace_meal_dialog.dart';
+import 'dialogs/share_meal_plan_dialog.dart';
+import 'dialogs/copy_meal_plan_dialog.dart';
 
 class MealPlanView extends StatefulWidget {
   const MealPlanView({super.key});
@@ -585,24 +589,66 @@ class _MealPlanViewState extends State<MealPlanView> {
     }
   }
 
-  void _generateMealPlan(
+  Future<void> _generateMealPlan(
     MealPlansProvider mealPlansProvider,
     MaterialsProvider materialsProvider,
-  ) {
-    // Implementation will be handled by the main screen's FAB
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Use the floating action button to generate a meal plan'),
-      ),
-    );
+  ) async {
+    final availableMaterials = materialsProvider.allMaterials
+        .where((material) => material.isAvailable)
+        .toList();
+
+    if (availableMaterials.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'No available materials found. Please add some materials first.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    try {
+      await mealPlansProvider.generateMealPlan(availableMaterials);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Meal plan generated successfully!')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to generate meal plan: $e')),
+        );
+      }
+    }
   }
 
   void _showMealTypeSelection(
     MealPlansProvider mealPlansProvider,
     MaterialsProvider materialsProvider,
   ) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Custom meal generation coming soon!')),
+    showDialog(
+      context: context,
+      builder: (context) => CustomMealGenerationDialog(
+        availableMaterials: materialsProvider.allMaterials
+            .where((material) => material.isAvailable)
+            .toList(),
+        onMealGenerated: (meal) {
+          // Add the generated meal to the current meal plan
+          final currentPlan = mealPlansProvider.selectedMealPlan;
+          if (currentPlan != null) {
+            mealPlansProvider.updateMealInPlan(meal.mealType, meal);
+          } else {
+            // Create a new meal plan with this meal
+            mealPlansProvider.createMealPlanWithMeal(
+              mealPlansProvider.selectedDate,
+              meal,
+            );
+          }
+        },
+      ),
     );
   }
 
@@ -613,9 +659,20 @@ class _MealPlanViewState extends State<MealPlanView> {
   }
 
   void _addMealToType(models.MealType mealType, MealPlansProvider provider) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Add ${mealType.displayName.toLowerCase()} coming soon!'),
+    final materialsProvider = context.read<MaterialsProvider>();
+
+    showDialog(
+      context: context,
+      builder: (context) => CustomMealGenerationDialog(
+        availableMaterials: materialsProvider.allMaterials
+            .where((material) => material.isAvailable)
+            .toList(),
+        initialMealType: mealType,
+        onMealGenerated: (meal) {
+          // Ensure the meal has the correct type
+          final correctedMeal = meal.copyWith(mealType: mealType);
+          provider.updateMealInPlan(mealType, correctedMeal);
+        },
       ),
     );
   }
@@ -655,19 +712,62 @@ class _MealPlanViewState extends State<MealPlanView> {
   }
 
   void _replaceMeal(models.MealType mealType, MealPlansProvider provider) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Replace ${mealType.displayName.toLowerCase()} coming soon!',
-        ),
+    final materialsProvider = context.read<MaterialsProvider>();
+    final currentMeal = provider.selectedMealPlan?.getMeal(mealType);
+
+    showDialog(
+      context: context,
+      builder: (context) => ReplaceMealDialog(
+        mealType: mealType,
+        currentMeal: currentMeal,
+        availableMaterials: materialsProvider.allMaterials
+            .where((material) => material.isAvailable)
+            .toList(),
+        onMealSelected: (newMeal) {
+          provider.updateMealInPlan(mealType, newMeal);
+        },
       ),
     );
   }
 
-  void _regenerateMealPlan(MealPlansProvider provider) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Regenerating meal plan...')));
+  Future<void> _regenerateMealPlan(MealPlansProvider provider) async {
+    final materialsProvider = context.read<MaterialsProvider>();
+    final availableMaterials = materialsProvider.allMaterials
+        .where((material) => material.isAvailable)
+        .toList();
+
+    if (availableMaterials.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'No available materials found. Please add some materials first.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    try {
+      // Clear existing meal plan first
+      if (provider.selectedMealPlan != null) {
+        provider.deleteMealPlan(provider.selectedMealPlan!.id);
+      }
+
+      // Generate new meal plan
+      await provider.generateMealPlan(availableMaterials);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Meal plan regenerated successfully!')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to regenerate meal plan: $e')),
+        );
+      }
+    }
   }
 
   void _saveMealPlan(models.MealPlan mealPlan, MealPlansProvider provider) {
@@ -677,14 +777,22 @@ class _MealPlanViewState extends State<MealPlanView> {
   }
 
   void _shareMealPlan(models.MealPlan mealPlan) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Share functionality coming soon!')),
+    showDialog(
+      context: context,
+      builder: (context) => ShareMealPlanDialog(mealPlan: mealPlan),
     );
   }
 
   void _copyMealPlan(MealPlansProvider provider) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Copy meal plan coming soon!')),
+    showDialog(
+      context: context,
+      builder: (context) => CopyMealPlanDialog(
+        targetDate: provider.selectedDate,
+        availableMealPlans: provider.mealPlans,
+        onMealPlanSelected: (copiedPlan) {
+          provider.saveMealPlan(copiedPlan);
+        },
+      ),
     );
   }
 

@@ -510,13 +510,40 @@ class _CalendarViewState extends State<CalendarView> {
     }
   }
 
-  void _generateMealPlanForSelectedDate() {
-    // This will be handled by the FloatingActionButton in MainScreen
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Use the floating action button to generate a meal plan'),
-      ),
-    );
+  Future<void> _generateMealPlanForSelectedDate() async {
+    final mealPlansProvider = context.read<MealPlansProvider>();
+    final materialsProvider = context.read<MaterialsProvider>();
+
+    final availableMaterials = materialsProvider.allMaterials
+        .where((material) => material.isAvailable)
+        .toList();
+
+    if (availableMaterials.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'No available materials found. Please add some materials first.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    try {
+      await mealPlansProvider.generateMealPlan(availableMaterials);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Meal plan generated successfully!')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to generate meal plan: $e')),
+        );
+      }
+    }
   }
 
   void _editMealPlan(MealPlansProvider provider, models.MealPlan mealPlan) {
